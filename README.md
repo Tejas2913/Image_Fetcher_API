@@ -1,16 +1,26 @@
-# React + Vite
+# Student Image Search App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a simple web application that allows users to search and view student-related images such as classrooms, libraries, and exam halls. It fetches images in real time using the Unsplash API.
 
-Currently, two official plugins are available:
+The project is built using **React + Vite**, with **Axios** for API calls, **useState hooks** for state management, and **TailwindCSS** for modern responsive styling.  
+It also includes a **Dark Mode toggle** for a better user experience.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
+- Search images related to student & academic environments
+- Real-time image fetching from Unsplash API
+- Responsive grid layout
+- Dark mode support
+- Clean and simple UI using TailwindCSS
 
-## React Compiler
+## Technologies Used
+- React + Vite
+- Axios (API calls)
+- TailwindCSS (styling)
+- Unsplash API
+- JavaScript (useState Hook)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## How It Works
+Type a keyword like **"classroom"**, **"library"**, or **"exam hall"** and the app displays relevant images instantly.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
