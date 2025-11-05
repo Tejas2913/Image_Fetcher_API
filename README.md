@@ -22,5 +22,4 @@ It also includes a **Dark Mode toggle** for a better user experience.
 ## How It Works
 Type a keyword like **"classroom"**, **"library"**, or **"exam hall"** and the app displays relevant images instantly.
 
----
 
