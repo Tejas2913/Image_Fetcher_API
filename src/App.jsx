@@ -3,82 +3,76 @@ import axios from "axios";
 
 function App() {
   const [keyword, setKeyword] = useState("");
-  const [students, setStudents] = useState([]);
+  const [universities, setUniversities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
   const suggestions = [
-    "John", "Ryan", "Emma", "Sophia", "Sam", "Olivia"
+    "India", "United States", "United Kingdom", "Canada", "Australia",
+    "Technology", "Engineering", "Medical", "Business", "Law"
   ];
 
-  const fetchStudents = async (e) => {
-    if (e?.preventDefault) e.preventDefault();
+  const searchUniversities = async (e) => {
+    e.preventDefault();
     setLoading(true);
-
     try {
-      const res = await axios.get("https://dummyjson.com/users");
-      const data = res.data.users;
+      const res = await axios.get("https://universities.hipolabs.com/search", {
+        params: { name: keyword }
+      });
 
-      const filtered = data.filter(
-        (u) =>
-          u.firstName.toLowerCase().includes(keyword.toLowerCase()) ||
-          u.lastName.toLowerCase().includes(keyword.toLowerCase()) ||
-          u.university?.toLowerCase().includes(keyword.toLowerCase())
-      );
-
-      setStudents(filtered);
+      setUniversities(res.data);
     } catch (err) {
-      alert("API Fetch Failed");
+      console.error(err);
+      alert("Error fetching universities");
     }
-
     setLoading(false);
   };
 
   return (
     <div className={darkMode ? "dark" : ""}>
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex justify-center items-center p-4">
-
         <div className="max-w-4xl w-full bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-
-          {/* Theme */}
-          <div className="flex justify-end mb-2">
+          
+          {/* Dark Mode Toggle */}
+          <div className="flex justify-end mb-4">
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm dark:text-white"
+              className="px-3 py-1 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow hover:opacity-80 transition"
             >
-              {darkMode ? "☀ Light" : "🌙 Dark"}
+              {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
             </button>
           </div>
 
-          <h1 className="text-2xl font-bold text-center mb-4 text-blue-600 dark:text-blue-300">
-            🎓 EduSnap — Student Finder
+          {/* Title */}
+          <h1 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            🎓 Edu Snap — University Finder
           </h1>
 
-          {/* Search */}
-          <form onSubmit={fetchStudents} className="flex gap-2 mb-4">
+          {/* Search Form */}
+          <form onSubmit={searchUniversities} className="flex flex-col sm:flex-row gap-3 mb-6 justify-center">
             <input
               type="text"
-              className="flex-1 p-2 border rounded dark:bg-gray-700 dark:text-white"
-              placeholder="Search student — e.g., John, Emma"
+              className="border p-3 rounded-md w-full sm:w-64 focus:ring-2 focus:ring-blue-400 outline-none shadow-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100"
+              placeholder="Search by name / country — e.g., India, Engineering"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               required
             />
-            <button className="bg-blue-600 text-white px-5 rounded">
-              {loading ? "..." : "Search"}
+            <button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 px-6 py-3 rounded-md text-white font-semibold shadow transition">
+              {loading ? "Searching..." : "Search"}
             </button>
           </form>
 
           {/* Suggestions */}
-          <div className="flex flex-wrap gap-2 justify-center mb-4">
-            {suggestions.map((s, i) => (
+          <div className="flex flex-wrap justify-center gap-2 mb-4">
+            {suggestions.map((s, idx) => (
               <button
-                key={i}
+                key={idx}
                 onClick={() => {
                   setKeyword(s);
-                  fetchStudents();
+                  searchUniversities({preventDefault: () => {}});
                 }}
-                className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-sm dark:text-white"
+                className="px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-600 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-500 transition"
               >
                 {s}
               </button>
@@ -87,32 +81,33 @@ function App() {
 
           {/* Loader */}
           {loading && (
-            <p className="text-center text-blue-500">Searching…</p>
+            <div className="flex justify-center my-5">
+              <div className="border-4 border-blue-500 border-t-transparent rounded-full w-10 h-10 animate-spin"></div>
+            </div>
           )}
 
-          {/* Students Grid */}
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {students.map((u) => (
-              <div key={u.id} className="bg-gray-100 dark:bg-gray-700 p-4 rounded shadow">
-                <img
-                  src={u.image}
-                  className="w-24 h-24 rounded-full mx-auto mb-2 border"
-                  alt=""
-                />
-                <h2 className="font-bold text-center dark:text-white">
-                  {u.firstName} {u.lastName}
-                </h2>
-                <p className="text-sm text-center text-gray-600 dark:text-gray-300">{u.email}</p>
-                <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">
-                  {u.university || "Student"}
-                </p>
+          {/* Results */}
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {universities.map((u, i) => (
+              <div key={i} className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow hover:shadow-md transition">
+                <h3 className="font-bold text-lg dark:text-white truncate">{u.name}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Country: {u.country}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Domain: {u.domains?.[0]}</p>
+                <a
+                  href={u.web_pages?.[0]}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2 block text-center bg-blue-600 text-white py-1 rounded text-sm hover:bg-blue-700 dark:hover:bg-blue-500"
+                >
+                  Visit Website
+                </a>
               </div>
             ))}
           </div>
 
-          {!loading && students.length === 0 && (
-            <p className="text-center text-gray-500 dark:text-gray-300 mt-4">
-              Try searching: **John**, **Emma**, **Olivia**
+          {!loading && universities.length === 0 && (
+            <p className="text-center text-gray-600 dark:text-gray-300 mt-6 text-sm md:text-base">
+              🔍 Try: <b>India</b>, <b>United States</b>, <b>Engineering</b>, <b>Business</b>
             </p>
           )}
 
