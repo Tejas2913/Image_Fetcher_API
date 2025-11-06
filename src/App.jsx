@@ -9,19 +9,32 @@ function App() {
 
   const suggestions = [
     "AI", "Python", "Machine Learning", "Web Development", "Data Science",
-    "Cloud Computing", "Cyber Security", "Database", "Java", "React"
+    "Cloud", "Cyber Security", "Database", "Java", "React"
   ];
 
+  const filters = [
+    "Artificial Intelligence",
+    "Machine Learning",
+    "Web Development",
+    "Data Science",
+    "Cyber Security",
+    "Cloud Computing",
+    "Python"
+  ];
+  
   const searchCourses = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const res = await axios.get("https://freetestapi.com/api/v1/courses");
+      const res = await axios.get(
+        "https://raw.githubusercontent.com/theapache64/awesome-course-data/master/courses.json"
+      );
 
       const filtered = res.data.filter(course =>
         course.title.toLowerCase().includes(keyword.toLowerCase()) ||
-        course.category.toLowerCase().includes(keyword.toLowerCase())
+        course.platform.toLowerCase().includes(keyword.toLowerCase()) ||
+        course.topic.toLowerCase().includes(keyword.toLowerCase())
       );
 
       setCourses(filtered);
@@ -75,7 +88,7 @@ function App() {
           </form>
 
           {/* Suggested Keywords */}
-          <div className="flex flex-wrap justify-center gap-2 mb-6">
+          <div className="flex flex-wrap justify-center gap-2 mb-3">
             {suggestions.map((word, idx) => (
               <button
                 key={idx}
@@ -92,6 +105,24 @@ function App() {
             ))}
           </div>
 
+          {/* Category Filters */}
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            {filters.map((word, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  setKeyword(word);
+                  searchCourses({ preventDefault: () => {} });
+                }}
+                className="px-3 py-1 text-sm rounded-full bg-purple-100 dark:bg-purple-800 
+                text-purple-700 dark:text-purple-200 border border-purple-300 dark:border-purple-600 
+                hover:bg-purple-600 hover:text-white dark:hover:bg-purple-500 transition"
+              >
+                {word}
+              </button>
+            ))}
+          </div>
+
           {/* Loader */}
           {loading && (
             <div className="flex justify-center my-5">
@@ -101,11 +132,11 @@ function App() {
 
           {/* Courses Grid */}
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {courses.map(course => (
-              <div key={course.id} className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow hover:shadow-lg transition">
-                <img src={course.thumbnail} className="w-full h-40 object-cover rounded-lg mb-2" />
+            {courses.map((course, i) => (
+              <div key={i} className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow hover:shadow-lg transition">
+                <img src={course.image} className="w-full h-40 object-cover rounded-lg mb-2" />
                 <h3 className="font-bold text-lg text-gray-800 dark:text-white">{course.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">{course.provider}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">{course.platform}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{course.description}</p>
                 <a
                   href={course.url}
@@ -120,7 +151,7 @@ function App() {
 
           {!loading && courses.length === 0 && (
             <p className="text-center text-gray-600 dark:text-gray-300 mt-6 text-sm md:text-base">
-              🔍 Try searches like <b>AI</b>, <b>Python</b>, <b>Web Development</b>, <b>Data Science</b>
+              🎯 Try searching <b>AI</b>, <b>Python</b>, <b>Web Development</b>, <b>Cloud</b>, <b>Data Science</b>
             </p>
           )}
         </div>
