@@ -3,66 +3,42 @@ import axios from "axios";
 
 function App() {
   const [keyword, setKeyword] = useState("");
-  const [images, setImages] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
-  const allowedKeywords = [
-  "student", "students", "school", "college", "university", "campus",
-  "classroom", "lecture", "teacher", "professor", "faculty", "education",
-  "books", "book", "library", "notebook", "study", "studying", "exam",
-  "exams", "test", "timetable", "attendance", "assignment", "homework",
-  "whiteboard", "classroom board", "bench", "desk", "hostel", "canteen",
-  "computer lab", "lab", "playground", "graduation", "uniform", "school bag",
-  "backpack", "id card", "student id", "digital learning", "e-learning",
-  "smart classroom", "students group"
-];
+  const suggestions = [
+    "AI", "Python", "Machine Learning", "Web Development", "Data Science",
+    "Cloud Computing", "Cyber Security", "Database", "Java", "React"
+  ];
 
-  const domain = "Student Management System";
+  const searchCourses = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  const searchImages = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    try {
+      const res = await axios.get("https://freetestapi.com/api/v1/courses");
 
-  const isAllowed = allowedKeywords.some(word =>
-    keyword.toLowerCase().includes(word)
-  );
+      const filtered = res.data.filter(course =>
+        course.title.toLowerCase().includes(keyword.toLowerCase()) ||
+        course.category.toLowerCase().includes(keyword.toLowerCase())
+      );
 
-  if (!isAllowed) {
-    setImages([]);
+      setCourses(filtered);
+    } catch (err) {
+      console.log(err);
+      alert("Error fetching courses");
+    }
+
     setLoading(false);
-    alert("Please enter only student-related terms (e.g., classroom, exam, library)");
-    return;
-  }
-
-  const ACCESS_KEY = "4ciPhaaUBnQsEMOICaFsRAuBFyj8Jp0YAL6L7IvgKPk";
-
-  try {
-    const res = await axios.get("https://api.unsplash.com/search/photos", {
-      params: {
-        query: `${domain} ${keyword}`,
-        per_page: 12,
-      },
-      headers: {
-        Authorization: `Client-ID ${ACCESS_KEY}`,
-      },
-    });
-
-    const imgs = res.data.results.map(img => img.urls.small);
-    setImages(imgs);
-  } catch {
-    alert("Error fetching images");
-  }
-
-  setLoading(false);
-};
+  };
 
   return (
     <div className={darkMode ? "dark" : ""}>
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-all flex items-center justify-center p-4">
         <div className="w-full max-w-4xl bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 md:p-10 border dark:border-gray-700 transition">
 
-          {/* Dark Mode Button */}
+          {/* Dark Mode Toggle */}
           <div className="flex justify-end mb-4">
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -78,29 +54,43 @@ function App() {
           <h1 className="text-2xl md:text-3xl font-bold text-center mb-6 bg-gradient-to-r 
            from-blue-600 to-purple-600 dark:from-purple-400 dark:to-blue-300 
            bg-clip-text text-transparent">
-            🎓 Student Management System Image Search
+            🎓 Edu Snap — Course Finder
           </h1>
 
           {/* Search Form */}
-          <form
-            onSubmit={searchImages}
-            className="flex flex-col sm:flex-row justify-center gap-3 mb-8"
-          >
+          <form onSubmit={searchCourses} className="flex flex-col sm:flex-row justify-center gap-3 mb-4">
             <input
               type="text"
               className="border p-3 rounded-md w-full sm:w-64 focus:ring-2
               focus:ring-blue-400 outline-none shadow-sm bg-white dark:bg-gray-700 
               border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100"
-              placeholder="Search — classroom, exam hall"
+              placeholder="Search courses — e.g., AI, Python"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               required
             />
-
             <button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 px-6 py-3 rounded-md text-white font-semibold shadow transition">
               {loading ? "Searching..." : "Search"}
             </button>
           </form>
+
+          {/* Suggested Keywords */}
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            {suggestions.map((word, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  setKeyword(word);
+                  searchCourses({ preventDefault: () => {} });
+                }}
+                className="px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-700 
+                text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-600 
+                hover:bg-blue-600 hover:text-white dark:hover:bg-blue-500 transition"
+              >
+                {word}
+              </button>
+            ))}
+          </div>
 
           {/* Loader */}
           {loading && (
@@ -109,23 +99,28 @@ function App() {
             </div>
           )}
 
-          {/* Image Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {images.map((img, i) => (
-              <div key={i} className="overflow-hidden rounded-xl shadow-sm hover:shadow-md transition">
-                <img
-                  src={img}
-                  alt="result"
-                  className="w-full h-36 sm:h-40 md:h-48 object-cover hover:scale-110 transition-transform duration-300"
-                />
+          {/* Courses Grid */}
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {courses.map(course => (
+              <div key={course.id} className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow hover:shadow-lg transition">
+                <img src={course.thumbnail} className="w-full h-40 object-cover rounded-lg mb-2" />
+                <h3 className="font-bold text-lg text-gray-800 dark:text-white">{course.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">{course.provider}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{course.description}</p>
+                <a
+                  href={course.url}
+                  target="_blank"
+                  className="mt-2 inline-block w-full text-center bg-blue-600 text-white rounded-md py-1 hover:bg-blue-700 dark:hover:bg-blue-500"
+                >
+                  View Course
+                </a>
               </div>
             ))}
           </div>
 
-          {/* Empty State */}
-          {!loading && images.length === 0 && (
+          {!loading && courses.length === 0 && (
             <p className="text-center text-gray-600 dark:text-gray-300 mt-6 text-sm md:text-base">
-              🔍 Try searching <b>classroom</b>, <b>library</b>, <b>exam hall</b>
+              🔍 Try searches like <b>AI</b>, <b>Python</b>, <b>Web Development</b>, <b>Data Science</b>
             </p>
           )}
         </div>
