@@ -3,53 +3,32 @@ import axios from "axios";
 
 function App() {
   const [keyword, setKeyword] = useState("");
-  const [courses, setCourses] = useState([]);
+  const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
   const suggestions = [
-    "JavaScript", "Python", "Backend", "Frontend", "DevOps",
-    "Cloud", "Database", "AI", "React", "Cybersecurity"
+    "John", "Ryan", "Emma", "Sophia", "Sam", "Olivia"
   ];
 
-  const filters = [
-    "JavaScript", "Python", "Fullstack", "Backend",
-    "Frontend", "Cloud", "Database", "DevOps", "AI"
-  ];
-
-  const placeholderImg =
-    "https://via.placeholder.com/150/2563eb/ffffff?text=Course";
-
-  const searchCourses = async (e) => {
+  const fetchStudents = async (e) => {
     if (e?.preventDefault) e.preventDefault();
     setLoading(true);
 
     try {
-      const res = await axios.get(
-        "https://api.sampleapis.com/codingresources/codingResources"
+      const res = await axios.get("https://dummyjson.com/users");
+      const data = res.data.users;
+
+      const filtered = data.filter(
+        (u) =>
+          u.firstName.toLowerCase().includes(keyword.toLowerCase()) ||
+          u.lastName.toLowerCase().includes(keyword.toLowerCase()) ||
+          u.university?.toLowerCase().includes(keyword.toLowerCase())
       );
 
-      const term = keyword.toLowerCase();
-
-      const filtered = res.data.filter(
-        (item) =>
-          item.title.toLowerCase().includes(term) ||
-          item.description.toLowerCase().includes(term) ||
-          item.categories.join(" ").toLowerCase().includes(term)
-      );
-
-      const formatted = filtered.map((c) => ({
-        title: c.title,
-        description: c.description,
-        link: c.url,
-        category: c.categories.join(", "),
-        free: c.free,
-        image: placeholderImg
-      }));
-
-      setCourses(formatted);
+      setStudents(filtered);
     } catch (err) {
-      alert("Error fetching courses");
+      alert("API Fetch Failed");
     }
 
     setLoading(false);
@@ -59,29 +38,31 @@ function App() {
     <div className={darkMode ? "dark" : ""}>
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex justify-center items-center p-4">
 
-        <div className="max-w-5xl w-full bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+        <div className="max-w-4xl w-full bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
 
-          {/* Dark mode */}
+          {/* Theme */}
           <div className="flex justify-end mb-2">
             <button
-              className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 dark:text-white"
               onClick={() => setDarkMode(!darkMode)}
+              className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm dark:text-white"
             >
               {darkMode ? "☀ Light" : "🌙 Dark"}
             </button>
           </div>
 
           <h1 className="text-2xl font-bold text-center mb-4 text-blue-600 dark:text-blue-300">
-            🎓 Edu Snap — All Tech Courses Finder
+            🎓 EduSnap — Student Finder
           </h1>
 
           {/* Search */}
-          <form onSubmit={searchCourses} className="flex gap-2 mb-4">
+          <form onSubmit={fetchStudents} className="flex gap-2 mb-4">
             <input
+              type="text"
               className="flex-1 p-2 border rounded dark:bg-gray-700 dark:text-white"
-              placeholder="Search — e.g., Python, React, Cloud"
+              placeholder="Search student — e.g., John, Emma"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
+              required
             />
             <button className="bg-blue-600 text-white px-5 rounded">
               {loading ? "..." : "Search"}
@@ -95,9 +76,9 @@ function App() {
                 key={i}
                 onClick={() => {
                   setKeyword(s);
-                  searchCourses();
+                  fetchStudents();
                 }}
-                className="px-3 py-1 text-sm rounded bg-gray-200 dark:bg-gray-700 dark:text-white"
+                className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-sm dark:text-white"
               >
                 {s}
               </button>
@@ -106,38 +87,35 @@ function App() {
 
           {/* Loader */}
           {loading && (
-            <p className="text-center text-blue-500">Loading...</p>
+            <p className="text-center text-blue-500">Searching…</p>
           )}
 
-          {/* Results */}
+          {/* Students Grid */}
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {courses.map((c, i) => (
-              <div key={i} className="bg-gray-100 dark:bg-gray-700 p-4 rounded shadow">
-                <img src={c.image} className="w-full h-36 object-cover rounded mb-2" />
-                <h2 className="font-bold dark:text-white">{c.title}</h2>
-                <p className="text-xs text-gray-500 dark:text-gray-300 line-clamp-2">{c.description}</p>
-                <p className="text-xs text-gray-400">
-                  <b>Category:</b> {c.category}
+            {students.map((u) => (
+              <div key={u.id} className="bg-gray-100 dark:bg-gray-700 p-4 rounded shadow">
+                <img
+                  src={u.image}
+                  className="w-24 h-24 rounded-full mx-auto mb-2 border"
+                  alt=""
+                />
+                <h2 className="font-bold text-center dark:text-white">
+                  {u.firstName} {u.lastName}
+                </h2>
+                <p className="text-sm text-center text-gray-600 dark:text-gray-300">{u.email}</p>
+                <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">
+                  {u.university || "Student"}
                 </p>
-                <p className="text-xs mb-1">
-                  {c.free ? "✅ Free" : "💲 Paid"}
-                </p>
-                <a
-                  href={c.link}
-                  target="_blank"
-                  className="block text-center bg-blue-600 text-white py-1 rounded text-sm"
-                >
-                  View Course
-                </a>
               </div>
             ))}
           </div>
 
-          {!loading && courses.length === 0 && (
+          {!loading && students.length === 0 && (
             <p className="text-center text-gray-500 dark:text-gray-300 mt-4">
-              Try: **Python**, **React**, **DevOps**, **Cloud**
+              Try searching: **John**, **Emma**, **Olivia**
             </p>
           )}
+
         </div>
       </div>
     </div>
