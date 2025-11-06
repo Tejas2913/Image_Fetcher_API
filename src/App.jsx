@@ -30,7 +30,7 @@ function App() {
     }
 
     setLoading(true);
-    setError("");
+    setError("");  // Clear any previous errors
 
     const ACCESS_KEY = "4ciPhaaUBnQsEMOICaFsRAuBFyj8Jp0YAL6L7IvgKPk";  
 
