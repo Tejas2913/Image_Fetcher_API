@@ -7,33 +7,55 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
+  const allowedKeywords = [
+  "student", "students", "school", "college", "university", "campus",
+  "classroom", "lecture", "teacher", "professor", "faculty", "education",
+  "books", "book", "library", "notebook", "study", "studying", "exam",
+  "exams", "test", "timetable", "attendance", "assignment", "homework",
+  "whiteboard", "classroom board", "bench", "desk", "hostel", "canteen",
+  "computer lab", "lab", "playground", "graduation", "uniform", "school bag",
+  "backpack", "id card", "student id", "digital learning", "e-learning",
+  "smart classroom", "students group"
+];
+
   const domain = "Student Management System";
 
   const searchImages = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
-    const ACCESS_KEY = "4ciPhaaUBnQsEMOICaFsRAuBFyj8Jp0YAL6L7IvgKPk";
+  const isAllowed = allowedKeywords.some(word =>
+    keyword.toLowerCase().includes(word)
+  );
 
-    try {
-      const res = await axios.get("https://api.unsplash.com/search/photos", {
-        params: {
-          query: `${domain} ${keyword}`,
-          per_page: 12,
-        },
-        headers: {
-          Authorization: `Client-ID ${ACCESS_KEY}`,
-        },
-      });
-
-      const imgs = res.data.results.map((img) => img.urls.small);
-      setImages(imgs);
-    } catch {
-      alert("Error fetching images");
-    }
-
+  if (!isAllowed) {
+    setImages([]);
     setLoading(false);
-  };
+    alert("Please enter only student-related terms (e.g., classroom, exam, library)");
+    return;
+  }
+
+  const ACCESS_KEY = "4ciPhaaUBnQsEMOICaFsRAuBFyj8Jp0YAL6L7IvgKPk";
+
+  try {
+    const res = await axios.get("https://api.unsplash.com/search/photos", {
+      params: {
+        query: `${domain} ${keyword}`,
+        per_page: 12,
+      },
+      headers: {
+        Authorization: `Client-ID ${ACCESS_KEY}`,
+      },
+    });
+
+    const imgs = res.data.results.map(img => img.urls.small);
+    setImages(imgs);
+  } catch {
+    alert("Error fetching images");
+  }
+
+  setLoading(false);
+};
 
   return (
     <div className={darkMode ? "dark" : ""}>
