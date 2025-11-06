@@ -15,16 +15,18 @@ function App() {
   const searchUniversities = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
+      // CORS proxy added here
       const res = await axios.get(
-      `https://cors-anywhere.herokuapp.com/https://universities.hipolabs.com/search?name=${keyword}`
-});
+        `https://cors-anywhere.herokuapp.com/https://universities.hipolabs.com/search?name=${keyword}`
+      );
 
       setUniversities(res.data);
     } catch (err) {
-      console.error(err);
       alert("Error fetching universities");
     }
+
     setLoading(false);
   };
 
@@ -44,7 +46,9 @@ function App() {
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r 
+            from-blue-600 to-purple-600 dark:from-purple-400 dark:to-blue-300 
+            bg-clip-text text-transparent">
             🎓 Edu Snap — University Finder
           </h1>
 
@@ -52,7 +56,9 @@ function App() {
           <form onSubmit={searchUniversities} className="flex flex-col sm:flex-row gap-3 mb-6 justify-center">
             <input
               type="text"
-              className="border p-3 rounded-md w-full sm:w-64 focus:ring-2 focus:ring-blue-400 outline-none shadow-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100"
+              className="border p-3 rounded-md w-full sm:w-64 focus:ring-2
+              focus:ring-blue-400 outline-none shadow-sm bg-white dark:bg-gray-700 
+              border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100"
               placeholder="Search by name / country — e.g., India, Engineering"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
@@ -90,9 +96,9 @@ function App() {
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {universities.map((u, i) => (
               <div key={i} className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow hover:shadow-md transition">
-                <h3 className="font-bold text-lg dark:text-white truncate">{u.name}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Country: {u.country}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Domain: {u.domains?.[0]}</p>
+                <h3 className="font-bold text-lg dark:text-white">{u.name}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{u.country}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{u.domains?.[0]}</p>
                 <a
                   href={u.web_pages?.[0]}
                   target="_blank"
@@ -107,7 +113,7 @@ function App() {
 
           {!loading && universities.length === 0 && (
             <p className="text-center text-gray-600 dark:text-gray-300 mt-6 text-sm md:text-base">
-              🔍 Try: <b>India</b>, <b>United States</b>, <b>Engineering</b>, <b>Business</b>
+              🔍 Try searching: **India**, **United States**, **Engineering**, **Technology**
             </p>
           )}
 
