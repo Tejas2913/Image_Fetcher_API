@@ -8,12 +8,16 @@ function App() {
   const [error, setError] = useState("");
 
   // List of allowed student-related keywords
-  const allowedKeywords = [
-    "student", "students", "school", "college", "university", "campus",
-    "classroom", "lecture", "teacher", "professor", "faculty", "education",
-    "books", "library", "notebook", "study", "exam", "timetable", "attendance",
-    "assignment", "homework", "whiteboard", "playground", "graduation", "uniform"
-  ];
+ const allowedKeywords = [
+  "student", "students", "school", "college", "university", "campus",
+  "classroom", "lecture", "teacher", "professor", "faculty", "education",
+  "books", "book", "library", "notebook", "study", "studying", "exam",
+  "exams", "test", "timetable", "attendance", "assignment", "homework",
+  "whiteboard", "classroom board", "bench", "desk", "hostel", "canteen",
+  "computer lab", "lab", "playground", "graduation", "uniform", "school bag",
+  "backpack", "id card", "student id", "digital learning", "e-learning",
+  "smart classroom", "students group"
+];
 
   const searchImages = async (e) => {
     e.preventDefault();
