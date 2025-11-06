@@ -3,113 +3,99 @@ import axios from "axios";
 
 function App() {
   const [keyword, setKeyword] = useState("");
-  const [courses, setCourses] = useState([]);
+  const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [error, setError] = useState("");
 
-  const suggestions = [
-    "Python", "JavaScript", "Web Development", "Data Science", "AI", "Machine Learning"
+  // List of allowed student-related keywords
+  const allowedKeywords = [
+    "student", "students", "school", "college", "university", "campus",
+    "classroom", "lecture", "teacher", "professor", "faculty", "education",
+    "books", "library", "notebook", "study", "exam", "timetable", "attendance",
+    "assignment", "homework", "whiteboard", "playground", "graduation", "uniform"
   ];
 
-  const searchCourses = async (e) => {
+  const searchImages = async (e) => {
     e.preventDefault();
+
+    // Check if the entered keyword is allowed
+    const isAllowed = allowedKeywords.some((word) => 
+      keyword.toLowerCase().includes(word)
+    );
+
+    if (!isAllowed) {
+      setError("Please enter only student-related terms (e.g., classroom, exam, library).");
+      setImages([]);
+      return;
+    }
+
     setLoading(true);
+    setError("");
+
+    const ACCESS_KEY = "4ciPhaaUBnQsEMOICaFsRAuBFyj8Jp0YAL6L7IvgKPk";  
 
     try {
-      const res = await axios.get("https://www.open.edu.au/api/v1/courses", {
+      const res = await axios.get("https://api.unsplash.com/search/photos", {
         params: {
-          keyword: keyword,
+          query: keyword,
+          per_page: 12,
+        },
+        headers: {
+          Authorization: `Client-ID ${ACCESS_KEY}`,
         },
       });
-      setCourses(res.data);
+
+      const imgs = res.data.results.map((img) => img.urls.small);
+      setImages(imgs);
     } catch (err) {
-      alert("Error fetching courses");
+      setError("Error fetching images");
     }
+
     setLoading(false);
   };
 
   return (
-    <div className={darkMode ? "dark" : ""}>
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex justify-center items-center p-4">
+    <div className="min-h-screen bg-gray-100 p-6">
 
-        <div className="max-w-4xl w-full bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+      <h1 className="text-3xl font-bold text-center mb-6 text-blue-600">
+        Student Management System - Image Search
+      </h1>
 
-          {/* Dark Mode Toggle */}
-          <div className="flex justify-end mb-4">
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="px-3 py-1 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white"
-            >
-              {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-            </button>
-          </div>
+      {/* Search Form */}
+      <form onSubmit={searchImages} className="flex justify-center gap-4 mb-6">
+        <input
+          type="text"
+          className="border p-3 rounded-md w-64"
+          placeholder="Search for student-related images"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          required
+        />
+        <button className="bg-blue-600 text-white px-6 py-3 rounded-md">
+          {loading ? "Searching..." : "Search"}
+        </button>
+      </form>
 
-          <h1 className="text-3xl font-bold text-center mb-6 text-blue-600 dark:text-blue-300">
-            🎓 Edu Snap — Course Finder (Open Learn)
-          </h1>
+      {/* Error Message */}
+      {error && <p className="text-center text-red-600">{error}</p>}
 
-          {/* Search Form */}
-          <form onSubmit={searchCourses} className="flex gap-2 mb-6">
-            <input
-              type="text"
-              placeholder="Search courses — e.g., Python, React"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              className="flex-1 p-3 border rounded dark:bg-gray-700 dark:text-white"
-              required
+      {/* Image Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        {images.map((img, index) => (
+          <div key={index} className="overflow-hidden rounded-lg shadow-md">
+            <img
+              src={img}
+              alt="Student-related"
+              className="w-full h-48 object-cover rounded-lg"
             />
-            <button className="bg-blue-600 text-white px-6 py-3 rounded">
-              {loading ? "Searching..." : "Search"}
-            </button>
-          </form>
-
-          {/* Suggestions */}
-          <div className="flex flex-wrap gap-2 justify-center mb-4">
-            {suggestions.map((s, idx) => (
-              <button
-                key={idx}
-                onClick={() => {
-                  setKeyword(s);
-                  searchCourses({ preventDefault: () => {} });
-                }}
-                className="px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-600 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-500 transition"
-              >
-                {s}
-              </button>
-            ))}
           </div>
-
-          {/* Loader */}
-          {loading && (
-            <p className="text-center text-blue-500 mb-4">Loading courses...</p>
-          )}
-
-          {/* Results */}
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {courses.map((course, i) => (
-              <div key={i} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow">
-                <h3 className="font-semibold dark:text-white">{course.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{course.description}</p>
-                <a
-                  href={course.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-2 inline-block w-full text-center bg-blue-600 text-white py-1 rounded-md"
-                >
-                  View Course
-                </a>
-              </div>
-            ))}
-          </div>
-
-          {!loading && courses.length === 0 && (
-            <p className="text-center text-gray-500 dark:text-gray-300 mt-4">
-              Try searching: **Python**, **React**, **Web Development**
-            </p>
-          )}
-
-        </div>
+        ))}
       </div>
+
+      {/* Empty State Message */}
+      {!loading && images.length === 0 && !error && (
+        <p className="text-center text-gray-500 mt-6">Try searching for terms like classroom, exam, or library.</p>
+      )}
     </div>
   );
 }
