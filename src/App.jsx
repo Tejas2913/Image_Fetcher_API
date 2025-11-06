@@ -8,7 +8,8 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
 
   const suggestions = [
-    "Web Development", "JavaScript", "Python", "React", "Machine Learning", "Data Science"
+    "Python", "React", "JavaScript", "Web Development", "Data Science",
+    "AI", "Machine Learning", "Backend", "Frontend"
   ];
 
   const searchCourses = async (e) => {
@@ -16,14 +17,23 @@ function App() {
     setLoading(true);
 
     try {
-      const res = await axios.get("https://api.freecodecamp.org/courses");
-      const filtered = res.data.filter((course) =>
-        course.title.toLowerCase().includes(keyword.toLowerCase()) ||
-        course.category.toLowerCase().includes(keyword.toLowerCase())
-      );
+      const res = await axios.get(
+        "https://api.pexels.com/v1/search", {
+          params: { query: keyword, per_page: 12 },
+          headers: {
+            Authorization: `Bearer GnWrJAkTvjkLnMMR89xr4MOfnsbOVrRJCuHZsVLqVE47DzToOMqk4iIL`
+          }
+        });
+
+      const filtered = res.data.photos.map((photo) => ({
+        title: photo.photographer,
+        image: photo.src.medium,
+        url: photo.url
+      }));
 
       setCourses(filtered);
     } catch (err) {
+      console.error(err);
       alert("Error fetching courses");
     }
     setLoading(false);
@@ -46,7 +56,7 @@ function App() {
           </div>
 
           <h1 className="text-2xl font-bold text-center mb-4 text-blue-600 dark:text-blue-300">
-            🎓 Edu Snap — Course Finder
+            🎓 Edu Snap — Course Finder (Pexels API)
           </h1>
 
           {/* Search */}
@@ -54,7 +64,7 @@ function App() {
             <input
               type="text"
               className="flex-1 p-2 border rounded dark:bg-gray-700 dark:text-white"
-              placeholder="Search courses — e.g., Web Development, React"
+              placeholder="Search courses — e.g., Python, React"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
             />
@@ -76,7 +86,7 @@ function App() {
             ))}
           </div>
 
-          {/* Loading */}
+          {/* Loader */}
           {loading && (
             <p className="text-center text-blue-500">Searching...</p>
           )}
@@ -85,13 +95,12 @@ function App() {
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
             {courses.map((c, i) => (
               <div key={i} className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow">
-                <h3 className="font-bold dark:text-white">{c.title}</h3>
-                <p className="text-xs text-gray-600 dark:text-gray-300">{c.category}</p>
+                <img src={c.image} className="w-full h-36 object-cover rounded mb-2" />
+                <h2 className="font-bold dark:text-white">{c.title}</h2>
                 <a
-                  href={c.link}
+                  href={c.url}
                   target="_blank"
-                  rel="noreferrer"
-                  className="mt-2 inline-block w-full text-center bg-blue-600 text-white py-1 rounded-md"
+                  className="block text-center bg-blue-600 text-white py-1 rounded-md mt-2"
                 >
                   View Course
                 </a>
@@ -101,7 +110,7 @@ function App() {
 
           {!loading && courses.length === 0 && (
             <p className="text-center text-gray-500 dark:text-gray-300 mt-4">
-              Try: **Web Development**, **Python**, **Data Science**
+              Try: **Python**, **React**, **Web Development**, **Machine Learning**
             </p>
           )}
 
