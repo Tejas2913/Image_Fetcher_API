@@ -8,8 +8,8 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
 
   const suggestions = [
-    "Python", "React", "JavaScript", "Web Development", "Data Science",
-    "AI", "Machine Learning", "Backend", "Frontend"
+    "Python", "JavaScript", "Web Development", "Data Science", "AI",
+    "Machine Learning", "React", "Backend", "Frontend"
   ];
 
   const searchCourses = async (e) => {
@@ -17,23 +17,18 @@ function App() {
     setLoading(true);
 
     try {
-      const res = await axios.get(
-        "https://api.pexels.com/v1/search", {
-          params: { query: keyword, per_page: 12 },
-          headers: {
-            Authorization: `Bearer GnWrJAkTvjkLnMMR89xr4MOfnsbOVrRJCuHZsVLqVE47DzToOMqk4iIL`
-          }
-        });
+      const res = await axios.get("https://free-course-api.p.rapidapi.com/courses", {
+        params: {
+          keyword: keyword,
+        },
+        headers: {
+          "X-RapidAPI-Host": "free-course-api.p.rapidapi.com",
+          "X-RapidAPI-Key": "22b8c89450msh3966595213a7b04p180ddejsn705116aff63e",  // Replace with your key
+        },
+      });
 
-      const filtered = res.data.photos.map((photo) => ({
-        title: photo.photographer,
-        image: photo.src.medium,
-        url: photo.url
-      }));
-
-      setCourses(filtered);
+      setCourses(res.data);
     } catch (err) {
-      console.error(err);
       alert("Error fetching courses");
     }
     setLoading(false);
@@ -42,10 +37,9 @@ function App() {
   return (
     <div className={darkMode ? "dark" : ""}>
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex justify-center items-center p-4">
-
         <div className="max-w-4xl w-full bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
 
-          {/* Dark Mode */}
+          {/* Dark Mode Toggle */}
           <div className="flex justify-end mb-4">
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -56,10 +50,10 @@ function App() {
           </div>
 
           <h1 className="text-2xl font-bold text-center mb-4 text-blue-600 dark:text-blue-300">
-            🎓 Edu Snap — Course Finder (Pexels API)
+            🎓 Edu Snap — Course Finder (RapidAPI)
           </h1>
 
-          {/* Search */}
+          {/* Search Form */}
           <form onSubmit={searchCourses} className="flex gap-2 mb-4">
             <input
               type="text"
@@ -86,7 +80,7 @@ function App() {
             ))}
           </div>
 
-          {/* Loader */}
+          {/* Loading */}
           {loading && (
             <p className="text-center text-blue-500">Searching...</p>
           )}
@@ -95,12 +89,13 @@ function App() {
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
             {courses.map((c, i) => (
               <div key={i} className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow">
-                <img src={c.image} className="w-full h-36 object-cover rounded mb-2" />
-                <h2 className="font-bold dark:text-white">{c.title}</h2>
+                <h3 className="font-bold dark:text-white">{c.title}</h3>
+                <p className="text-xs text-gray-600 dark:text-gray-300">{c.platform}</p>
                 <a
-                  href={c.url}
+                  href={c.link}
                   target="_blank"
-                  className="block text-center bg-blue-600 text-white py-1 rounded-md mt-2"
+                  rel="noreferrer"
+                  className="mt-2 inline-block w-full text-center bg-blue-600 text-white py-1 rounded-md"
                 >
                   View Course
                 </a>
@@ -110,7 +105,7 @@ function App() {
 
           {!loading && courses.length === 0 && (
             <p className="text-center text-gray-500 dark:text-gray-300 mt-4">
-              Try: **Python**, **React**, **Web Development**, **Machine Learning**
+              Try: **Python**, **React**, **Data Science**
             </p>
           )}
 
