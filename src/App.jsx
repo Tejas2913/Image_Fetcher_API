@@ -16,9 +16,9 @@ function App() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.get("https://universities.hipolabs.com/search", {
-        params: { name: keyword }
-      });
+      const res = await axios.get(
+      `https://cors-anywhere.herokuapp.com/https://universities.hipolabs.com/search?name=${keyword}`
+});
 
       setUniversities(res.data);
     } catch (err) {
